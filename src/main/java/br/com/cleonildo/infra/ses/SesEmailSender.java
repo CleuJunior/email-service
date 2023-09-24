@@ -9,9 +9,14 @@ import com.amazonaws.services.simpleemail.model.Content;
 import com.amazonaws.services.simpleemail.model.Destination;
 import com.amazonaws.services.simpleemail.model.Message;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SesEmailSender implements EmailSenderGateway {
     private final AmazonSimpleEmailService amazonSimpleEmailService;
+    @Value("${email}")
+    private String email;
 
     public SesEmailSender(AmazonSimpleEmailService amazonSimpleEmailService) {
         this.amazonSimpleEmailService = amazonSimpleEmailService;
@@ -20,12 +25,11 @@ public class SesEmailSender implements EmailSenderGateway {
     @Override
     public void sendEmail(String to, String subject, String body) {
         SendEmailRequest request = new SendEmailRequest()
-                .withSource("cleu.junior@gmail.com")
-                .withDestination(new Destination().withBccAddresses("cleu.junior@gmail.com"))
+                .withSource(email)
+                .withDestination(new Destination().withBccAddresses(email))
                 .withMessage(new Message()
                         .withSubject(new Content(subject))
                         .withBody(new Body().withText(new Content(body))));
-
         try {
             this.amazonSimpleEmailService.sendEmail(request);
 
